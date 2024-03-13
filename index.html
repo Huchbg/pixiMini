@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.3.3/pixi.min.js"></script>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+
+      let clickCount = 0;
+      let random = 0xffffff;
+      const app = new PIXI.Application({
+        width: screenWidth,
+        height: screenHeight,
+        backgroundColor: random,
+      });
+      document.body.appendChild(app.view);
+
+      const ball = new PIXI.Sprite(PIXI.Texture.WHITE);
+      ball.tint = parseInt(808080, 16);
+      ball.anchor.set(0.5);
+      ball.x = app.screen.width / 2;
+      ball.y = app.screen.height / 2;
+      ball.width = 100;
+      ball.height = 100;
+      app.stage.addChild(ball);
+
+      const addInteraction = (value) => {
+        if (value == 0) {
+          clickCount = 0;
+        }
+        ball.interactive = true;
+        ball.on("pointertap", () => {
+          velocityY = -10;
+          clickCount++;
+        });
+      };
+      addInteraction();
+
+      const style = new PIXI.TextStyle({
+        fontFamily: "Arial",
+        fontSize: 24,
+        fill: "white",
+      });
+      const clickCountText = new PIXI.Text(`Click Count: ${clickCount}`, style);
+      clickCountText.x = 10;
+      clickCountText.y = 10;
+      app.stage.addChild(clickCountText);
+
+      let velocityY = 0;
+
+      const gravity = 0.5;
+
+      const animate = (delta) => {
+        ball.y += velocityY;
+        velocityY += gravity;
+
+        if (ball.y + ball.height / 2 >= app.screen.height) {
+          ball.y = app.screen.height - ball.height / 2;
+          velocityY = -20;
+          random = Math.floor(Math.random() * 16777215).toString(16);
+          app.renderer.backgroundColor = PIXI.utils.string2hex(random);
+          clickCount = 0;
+        }
+        clickCountText.text = `Click Count: ${clickCount}`;
+      };
+
+      app.ticker.add(animate);
+    </script>
+  </body>
+</html>
